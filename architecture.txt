@@ -1,0 +1,11 @@
+Build Order I Recommend
+repo.py
+object_store.py
+commit_graph.py
+main.py with only init
+staging.py
+diff.py
+commit.py
+Add log
+Then build vector_index.py
+Then add search

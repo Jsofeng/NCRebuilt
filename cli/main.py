@@ -5,10 +5,11 @@ from typing import Optional #Used for a parameter that may be either a string or
 import typer #Typer turns Python functions into CLI commands.
 
 
-from cli.repo import nc_path, write_json
+from cli.repo import ( nc_path, write_json, find_repo )
 from storage.commit_graph import CommitGraph
 from storage.vector_index import VectorIndex
 from storage.object_store import ObjectStore
+
 
 def main():
     app = typer.Typer(help="NeuralCommit: AI-native version control.") # When a user runs python main.py --help that msg will show up
@@ -47,7 +48,5 @@ def main():
     def add(files: list[str]):
         pass
 
-
-    
     #TBC...
 
