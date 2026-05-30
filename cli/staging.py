@@ -35,6 +35,8 @@ by_path = {
     "b.txt": {"path": "b.txt", "blob_sha": "456"}
 }
 
+if the file already exists replace it with the new one
+
 """
 def stage_files(repo: Path, files: tuple[str, ...], snapshot: dict[str, str], store: ObjectStore) -> list[dict[str,str]]: 
     staged = read_json(nc_path(repo) / "staging" / "index.json", []) #returns a list of all staged files
