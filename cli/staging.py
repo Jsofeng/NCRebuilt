@@ -24,12 +24,12 @@ def summarize_change(path: str, status: str, diff_text: str) -> str: #status (ad
 
 stage_files functionality: Takes files → checks them → stores their content → computes diff → saves them into a staging index → returns staged files
 
-line 41: staged = [
+line 43: staged = [
     {"path": "a.txt", "blob_sha": "123"},
     {"path": "b.txt", "blob_sha": "456"}
 ]
 
-line 58: 
+line 60: 
 by_path = {
     "a.txt": {"path": "a.txt", "blob_sha": "123"},
     "b.txt": {"path": "b.txt", "blob_sha": "456"}

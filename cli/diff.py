@@ -63,7 +63,7 @@ annotate_diff example output
 """
 
 
-def annotate_diff(diff_text: str) -> str:
+def annotate_diff(diff_text: str) -> str: #TBC -> Wait for Claude api & LLM reasoning
     annotations: list[str] = []
     for line in diff_text.splitlines():
         annotations.append(line)
