@@ -18,8 +18,25 @@ def summarize_change(path: str, status: str, diff_text: str) -> str: #status (ad
     removed = sum(1 for line in diff_text.splitlines() if line.startswith("-") and not line.startswith("---"))
     return f"{status} {path}: +{added}/-{removed} lines"
 
+"""
+#files (the files that the user wants to stage) 
+#snapshot (latest committed files)
 
-def stage_files(repo: Path, files: tuple[str, ...], snapshot: dict[str, str], store: ObjectStore) -> list[dict[str,str]]: #files (the files that the user wants to stage) -> snapshot (latest committed files)
+stage_files functionality: Takes files → checks them → stores their content → computes diff → saves them into a staging index → returns staged files
+
+line 41: staged = [
+    {"path": "a.txt", "blob_sha": "123"},
+    {"path": "b.txt", "blob_sha": "456"}
+]
+
+line 58: 
+by_path = {
+    "a.txt": {"path": "a.txt", "blob_sha": "123"},
+    "b.txt": {"path": "b.txt", "blob_sha": "456"}
+}
+
+"""
+def stage_files(repo: Path, files: tuple[str, ...], snapshot: dict[str, str], store: ObjectStore) -> list[dict[str,str]]: 
     staged = read_json(nc_path(repo) / "staging" / "index.json", []) #returns a list of all staged files
     by_path = {item["path"]: item for item in staged} #turns the list into a dict if the same files are staged the most recent one replaces the old one
 
