@@ -10,6 +10,7 @@ from __future__ import annotations
 from pathlib import Path
 from storage.object_store import ObjectStore
 from cli.repo import nc_path, read_json, write_json
+from cli.diff import diff_against_snapshot
 
 
 def summarize_change(path: str, status: str, diff_text: str) -> str: #status (added, modified, deleted)
