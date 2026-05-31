@@ -5,11 +5,12 @@ from typing import Optional #Used for a parameter that may be either a string or
 import typer #Typer turns Python functions into CLI commands.
 
 
-from cli.repo import ( nc_path, write_json, find_repo )
+from cli.repo import ( nc_path, write_json, read_json, find_repo )
 from storage.commit_graph import CommitGraph
 from storage.vector_index import VectorIndex
 from storage.object_store import ObjectStore
 from cli.staging import stage_files, clear_stage
+from cli.diff import annotate_diff, diff_against_snapshot
 
 
 def main():
@@ -71,4 +72,57 @@ def main():
             typer.echo(item["summary"]) #prints out all new changes added/modified/removed
 
     
+        """
+            nc diff
+                ↓
+            find_repo()
+                ↓
+        load commit graph
+                ↓
+        load object store
+                ↓
+        read staged files
+                ↓
+        extract paths
+                ↓
+    diff_against_snapshot()
+                ↓
+      load old version
+                ↓
+      load current version
+                ↓
+      generate git-style diff
+                ↓
+        annotate_diff()
+            ↓
+        scan + and - lines
+            ↓
+        add AI comments
+            ↓
+        typer.echo()
+            ↓
+        print result
 
+
+        Take staged file list
+                ↓
+        For each staged file:
+        compare committed version
+                vs
+        current working version
+
+        """
+
+    @app.command()
+    def diff():
+        repo = find_repo()
+        graph = CommitGraph(nc_path(repo) / "commits.db")
+        store = ObjectStore(nc_path(repo))
+        staged = read_json(nc_path(repo) / "staging" / "index.json", [])
+        paths = [item["path"] for item in staged] #extracts only paths from the CURRENT list of paths from STAGED and other stuff from staging
+
+        typer.echo(
+            annotate_diff(
+                diff_against_snapshot(repo, graph.latest_snapshot, store, paths) #ts function compares current staged with previous committed files with the same file
+            )
+        )
