@@ -9,6 +9,7 @@ from cli.repo import ( nc_path, write_json, find_repo )
 from storage.commit_graph import CommitGraph
 from storage.vector_index import VectorIndex
 from storage.object_store import ObjectStore
+from cli.staging import stage_files, clear_stage
 
 
 def main():
@@ -44,9 +45,30 @@ def main():
         VectorIndex(root / "vector_index.db")
         typer.echo(f"Initialized NeuralCommit repository in {root}")
 
+    """
+    User types nc add
+            ↓
+        find repo
+            ↓
+    load commit history
+            ↓
+    load object storage
+            ↓
+        stage files
+            ↓
+     print summaries
+        
+    """
+
     @app.command()
     def add(files: list[str]):
-        pass
+        repo = find_repo() #finds root repo e.g (if this was where .neuralcommit was found project/.neuralcommit -> returns project/)
+        graph = CommitGraph(nc_path(repo) / "commits.db") 
+        store = ObjectStore(nc_path(repo))
+        staged = stage_files(repo, files, graph.latest_snapshot, store)
 
-    #TBC...
+        for item in staged:
+            typer.echo(item["summary"]) #prints out all new changes added/modified/removed
+
+    
 

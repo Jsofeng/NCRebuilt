@@ -2,7 +2,7 @@ from __future__ import annotations
 import json
 from pathlib import Path #allows us to use <fileName> / <fileName> / <fileName>
 
-NC_DIR = ".neurocommit" #constant ROOT DIR FOR ALL DIRECTORIES CREATED
+NC_DIR = ".neuralcommit" #constant ROOT DIR FOR ALL DIRECTORIES CREATED
 
 def find_repo(start: Path | None = None) -> Path: #This function finds the root folder of a NeuralCommit repo (if you do nc add <filename> it will find dir and add it to that one).
     current = (start or Path.cwd()).resolve() 
