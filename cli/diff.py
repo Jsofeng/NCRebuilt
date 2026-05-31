@@ -34,7 +34,7 @@ def unified_diff(path: str, before: str, after: str) -> str:
     )
 
 """
-snapshot: prev committed file mapping:
+snapshot: most recently prev committed file mapping:
 paths: Files to compare:
 """
 def diff_against_snapshot(repo: Path, snapshot: dict[str,str], store: ObjectStore, paths: list[str]) -> str: 

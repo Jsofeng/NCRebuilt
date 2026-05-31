@@ -65,7 +65,7 @@ def stage_files(repo: Path, files: tuple[str, ...], snapshot: dict[str, str], st
         }
 
         result = list(by_path.values())
-        write_json(nc_path(repo) / "staging" / "index.json", result)
+        write_json(nc_path(repo) / "staging" / "index.json", result) #write all files to the staging zone
         return result
     
     
