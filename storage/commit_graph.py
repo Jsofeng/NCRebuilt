@@ -70,7 +70,7 @@ class CommitGraph:
         return dict(row) #returns an array of commits with the same commit_id
     
     def latest_snapshot(self) -> dict[str, str]: #return dict bc a commit can have multiple files
-        head = self.head()
+        head = self.head() #calls head function to find the latest commit
         if not head:
             return {}
         
