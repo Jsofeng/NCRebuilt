@@ -5,12 +5,13 @@ from typing import Optional #Used for a parameter that may be either a string or
 import typer #Typer turns Python functions into CLI commands.
 
 
-from cli.repo import ( nc_path, write_json, read_json, find_repo )
+from cli.repo import ( nc_path, write_json, read_json, find_repo, load_config )
 from storage.commit_graph import CommitGraph
 from storage.vector_index import VectorIndex
 from storage.object_store import ObjectStore
-from cli.staging import stage_files, clear_stage
+from cli.staging import stage_files
 from cli.diff import annotate_diff, diff_against_snapshot
+from cli.commit import create_commit
 
 
 def main():
@@ -126,3 +127,12 @@ def main():
                 diff_against_snapshot(repo, graph.latest_snapshot, store, paths) #ts function compares current staged with previous committed files with the same file
             )
         )
+
+    @app.command()
+    def commit(no_ai: bool = typer.Option(False, "--no-ai", help="Skip AI assist for this command.")):
+        repo = find_repo()
+        config = load_config(repo)
+        result = create_commit(repo, config.get("author", "unknown"), no_ai=no_ai)
+         
+        typer.echo(f"[{result['id']}] {result['message']}")
+        typer.echo(result["summary"])
