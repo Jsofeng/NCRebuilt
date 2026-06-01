@@ -61,8 +61,45 @@ def conventional_message(staged, diff_text, no_ai=False) -> str:
     return f"{prefix}: update {subject} ({suffix})"
 
 
+def create_commit(repo: Path, author: str, no_ai: bool = False) -> dict:
+    graph = CommitGraph(nc_path(repo) / "commits.db") # write commit history
+    store = ObjectStore(nc_path(repo)) # read old blobs for diff
+
+    staged = read_json(nc_path(repo) / "staging" / "index.json", [])
+    
+    if not staged:
+        raise ValueError("nothing staged: run 'nc add <files> first'")
+    
+    snapshot = graph.latest_snapshot() #retrieve the latest commit files
+    paths = [item["path"] for item in staged]
+    diff_text = diff_against_snapshot(repo, snapshot, store, paths) #diff: compares difference between the old and newly added files
+
+    created_at = datetime.now(timezone.utc).isoformat()
+    message = conventional_message(staged, diff_text, no_ai=no_ai)
+
+    summary = "; ".join(item["summary"] for item in staged)
+    parent_id = graph.head()
+    commit_id = hashlib.sha256(
+        f"{parent_id}:{message}:{summary}:{diff_text}:{created_at}".encode()
+    ).hexdigest()[:16]
+
+    files = snapshot_to_files(snapshot, staged) #updates the commit snapshot and newly modified files/dir,etc
+    commit = {
+        "id": commit_id,
+        "parent_id": parent_id,
+        "message": message,
+        "summary": summary,
+        "diff": diff_text,
+        "author": author, 
+        "score": 50 if no_ai else 65, #ai placeholder for now
+        "report": {},
+        "created_at": created_at,
+    }
 
 
+    graph.add_commit(commit_id, files)
+    clear_stage(repo)
+    return commit 
 
 """
 snapshot_to_files functionality
