@@ -62,3 +62,62 @@ def conventional_message(staged, diff_text, no_ai=False) -> str:
 
 
 
+
+
+"""
+snapshot_to_files functionality
+
+latest snapshot:
+{
+    "README.md": "old_readme_blob",
+    "app.py": "old_app_blob"
+}
+
+
+staged changes:
+[
+    {
+        "path": "app.py",
+        "blob_sha": "new_app_blob",
+        "status": "modified",
+        "summary": "modified app.py: +2/-1 lines"
+    }
+]
+
+new commit snapshot:
+[
+    {
+        "path": "README.md",
+        "blob_sha": "old_readme_blob",
+        "status": "unchanged",
+        "summary": "unchanged"
+    },
+    {
+        "path": "app.py",
+        "blob_sha": "new_app_blob",
+        "status": "modified",
+        "summary": "modified app.py: +2/-1 lines"
+    }
+]
+"""
+
+
+def snapshot_to_files(snapshot: dict[str, str], staged: list[dict[str,str]]) -> list[dict[str,str]]:
+    merged = {
+        path: {
+            "path": path,
+            "blob_sha": blob,
+            "status": "unchanged",
+            "summary": "unchanged",
+        }
+        for path, blob in snapshot.items()
+    }
+
+    for item in staged: #If a staged file changed, replace the old entry.
+        merged[item["path"]] = item
+
+    return list(merged.values())
+        
+    
+
+    
