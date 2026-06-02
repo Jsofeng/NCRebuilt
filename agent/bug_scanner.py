@@ -29,7 +29,7 @@ diff_text = '
 
 """
 
-def heuristic_scan(diff_text: str) -> list[dict]: #This is offline bug detection.
+def heuristic_scan(diff_text: str) -> list[dict]: #This is offline bug detection. NO AI USED
     findings: list[dict] = []
     current_file = "unknown"
     new_line = 0
@@ -78,4 +78,22 @@ def heuristic_scan(diff_text: str) -> list[dict]: #This is offline bug detection
     return findings
 
 
-        
+"""
+FUNCTIONALITY: Scans a git diff for bugs/vulnerabilities using AI, but falls back to a fast local scanner if needed.
+
+skips claude and returns local findings (nc push --no-ai)
+
+force_local: skips Claude and returns local findings.
+
+"""
+def scan(diff_text: str, client: ClaudeClient | None = None, force_local: bool = False) -> dict:
+    
+    fallback = {"findings": heuristic_scan(diff_text)} #Reason for implementation: works as a backup scanner, AI can fail, be slow, or cost money
+    if force_local: #If user explicitly says: --no-ai skips and js returns fallback
+        return fallback
+    
+    user = f"scan this git-style diff for bugs and vulnerabilities:\n\n{diff_text[:12000]}"
+    result = (client or ClaudeClient()).complete_json(SYSTEM, user, SCHEMA, fallback) #gets AI's response instead of heuristic
+    if not result.get("findings"): #if findings doesn't exist after getting back complete_json then set it to heuristic_scans
+        result["findings"] = fallback["findings"]
+    return result
