@@ -136,3 +136,15 @@ def main():
          
         typer.echo(f"[{result['id']}] {result['message']}")
         typer.echo(result["summary"])
+
+    @app.command()
+    def log(limit: int = 20):
+        repo = find_repo()
+        graph = CommitGraph(nc_path(repo) / "commits.db")
+
+        for item in graph.list_commits():
+            typer.echo(f"{item['id']} score={item['score']} {item['created_at']}")
+            typer.echo(f"  {item['message']}")
+            typer.echo(f"  {item['summary']}")
+
+    
