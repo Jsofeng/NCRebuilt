@@ -13,6 +13,14 @@ from cli.staging import stage_files
 from cli.diff import annotate_diff, diff_against_snapshot
 from cli.commit import create_commit
 
+"""
+NeuralCommit Workflow
+
+working file -> object store -> staging/index.json
+staging/index.json -> commits.db -> permanent history
+commits.db -> terminal output
+
+"""
 
 def main():
     app = typer.Typer(help="NeuralCommit: AI-native version control.") # When a user runs python main.py --help that msg will show up
