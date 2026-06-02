@@ -13,14 +13,14 @@ class ClaudeClient:
         self.model = model
 
     """
-    Send a prompt to Claude and expect JSON back.
+    Send a prompt to Claude and expect structured clean JSON back.
     param:
         - prompt
         - user prompt containing its diff
         - expects JSON shape
         - Offline-safe output if Claude cannot run.
     """
-    def complete_json(self, system: str, user: str, schema: dict[str, Any], fallback: dict[str, Any]) -> dict[str, Any]:
+    def complete_json(self, prompt: str, user: str, schema: dict[str, Any], fallback: dict[str, Any]) -> dict[str, Any]:
         
         api_key = os.getenv("ANTHROPIC_API_KEY")
         if not api_key:
@@ -37,7 +37,7 @@ class ClaudeClient:
                 message = client.messages.create(
                     model=self.model,
                     max_tokens=2000,
-                    system=system,
+                    system=prompt,
                     messages=[
                         {
                             "role": "user",
@@ -57,5 +57,4 @@ class ClaudeClient:
         enriched = dict(fallback)
         enriched["error"] = str(last_error)
         return enriched #If all retries fail, return fallback plus error message.
-    
     

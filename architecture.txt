@@ -9,3 +9,22 @@ commit.py
 Add log
 Then build vector_index.py
 Then add search
+
+
+---- Agentic Pipeline ----
+
+latest commit diff
+        ↓
+agent pipeline
+        ↓
+diff analyzer
+        ↓
+bug scanner
+        ↓
+refactor suggester
+        ↓
+PR summary generator
+        ↓
+commit scorer
+        ↓
+save report + score into SQLite

@@ -16,7 +16,7 @@ SCHEMA = {
     ]
 }
 
-SYSTEM = "You are a security-focused code reviewer..." #This tells Claude its role.
+SYSTEM = "You are a senior security-focused code reviewer at Anthropic..." #This tells Claude its role.
 
 """
 example input:
@@ -76,5 +76,6 @@ def heuristic_scan(diff_text: str) -> list[dict]: #This is offline bug detection
             new_line+=1 
         
     return findings
+
 
         
