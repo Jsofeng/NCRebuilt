@@ -12,7 +12,7 @@ from storage.object_store import ObjectStore
 from cli.staging import stage_files
 from cli.diff import annotate_diff, diff_against_snapshot
 from cli.commit import create_commit
-
+from cli.push import push as run_push
 """
 NeuralCommit Workflow
 
@@ -155,4 +155,8 @@ def main():
             typer.echo(f"  {item['message']}")
             typer.echo(f"  {item['summary']}")
 
-    
+    @app.command()
+    def push(no_ai: bool = typer.Option(False, "--no-ai", help="Skip external AI calls")):
+        repo = find_repo()
+        result = run_push(repo, no_ai=no_ai)
+        typer.echo(f"Pushed {result['commit_id']} with AI score {result['score']}")
