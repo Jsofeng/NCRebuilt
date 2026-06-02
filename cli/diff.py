@@ -17,7 +17,7 @@ def unified_diff(path: str, before: str, after: str) -> str:
     example of generation
     "--- a/test.txt\n"
     "+++ b/test.txt\n"
-    "@@ -1,3 +1,3 @@\n"
+    "@@ -1,3 +1,3 @@\n" means “A change occurs in lines 1–3 of both the old file and the new file.”
     " hello\n"
     "-world\n"
     "+python\n"
