@@ -20,7 +20,7 @@ class ClaudeClient:
         - expects JSON shape
         - Offline-safe output if Claude cannot run.
     """
-    def complete_json(self, prompt: str, user: str, schema: dict[str, Any], fallback: dict[str, Any]) -> dict[str, Any]: #AI USED FOR DETECTION OF SECURITY BUGS
+    def complete_json(self, system: str, user: str, schema: dict[str, Any], fallback: dict[str, Any]) -> dict[str, Any]: #AI USED FOR DETECTION OF SECURITY BUGS
         
         api_key = os.getenv("ANTHROPIC_API_KEY")
         if not api_key:
@@ -38,7 +38,7 @@ class ClaudeClient:
                 message = client.messages.create(
                     model=self.model,
                     max_tokens=2000,
-                    system=prompt,
+                    system=system,
                     messages=[
                         {
                             "role": "user",

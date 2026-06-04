@@ -43,13 +43,14 @@ def generate(diff_report: dict, bug_report: dict, refactor_report: dict, client:
         "what_changed": [
             item.get("reason", "Changed file") for item in diff_report.get("files_changed", []) #tries to get "reason" from diff_analyzer.SCHEMA.files_changed if it doesn't exist return "Changed file as the reason"
         ],
-        "why_changed": diff_report.get("likely_intent", "Intent inferred from commit diff"),
+        "why_changed": diff_report.get("likely_intent", "Intent inferred from commit diff"), #tries to get likely_intent from diff_analyzer.SCHEMA.likely_intent if it doesn't exist then return "Intent inferred from commit diff as the reason"
         "risks": [
-            finding.get("title", "Potential issue") for finding in bug_report.get("findings", [])
+            finding.get("title", "Potential issue") for finding in bug_report.get("findings", []) #tries to get title from bug_analyzer.SCHEMA.findings, if it doesn't exist then return "Potential issue" 
         ],
         "suggested_reviewers": ["repo-owner"],
     }
 
+    #Prompt for claude
     user = (
         "Synthesize these reports into a PR description.\n"
         f"Diff analyzer: {diff_report}\n"
@@ -57,4 +58,6 @@ def generate(diff_report: dict, bug_report: dict, refactor_report: dict, client:
         f"Refactor: {refactor_report}"
     )
 
+    #user is the output format
+    #schema is what we input into claude
     return (client or ClaudeClient()).complete_json(SYSTEM, user, SCHEMA, fallback)
