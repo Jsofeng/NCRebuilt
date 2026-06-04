@@ -32,10 +32,7 @@ SCHEMA = {
     "suggested_reviewers": ["string"]
 }
 
-SYSTEM = (
-    "You're a senior engineer at Anthropic and a professional at writing pull requests"
-    "descriptions from engineering analysis"
-)
+SYSTEM = "You're a senior engineer at Anthropic and a professional at writing pull requests. Descriptions from engineering analysis"
 
 def generate(diff_report: dict, bug_report: dict, refactor_report: dict, client: ClaudeClient | None = None) -> dict:
     fallback = {

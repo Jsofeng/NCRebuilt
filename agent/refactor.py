@@ -13,10 +13,7 @@ SCHEMA = {
     ]
 }
 
-SYSTEM = (
-    "You are a senior pragmatic refracting coach at Anthropic."
-    "Suggest only concrete improvements visible in the diff"
-)
+SYSTEM = "You are a senior pragmatic refracting coach at Anthropic. Suggest only concrete improvements visible in the diff"
 
 
 def suggest(diff_text: str, client: ClaudeClient | None = None) -> dict:
