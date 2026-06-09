@@ -37,3 +37,15 @@ def index():
     html = Path(__file__).parents[1] / "frontend" / "index.html" #parents[1] goes up 2 levels from cwd so -> neuralcommit/dashboard/frontend/index.html
     return HTMLResponse(html.read_text(encoding="utf-8")) #Read the HTML file as text and return it as an HTML response.
 
+
+@app.get("/api/commits")
+def commits():
+    rows = graph().list_commits(100)
+    # **row Take all key-value pairs from this dictionary and copy them here
+    return [
+        {
+            **row, 
+            "reports": json.loads(row.get("report_json") or "{}"),
+        }
+        for row in rows
+    ]
