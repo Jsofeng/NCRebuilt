@@ -78,3 +78,6 @@ def security_alerts():
     return alerts
 
 
+@app.get("api/search")
+def search():
+    pass
