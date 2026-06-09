@@ -49,3 +49,21 @@ def commits():
         }
         for row in rows
     ]
+
+
+@app.get("api/health")
+def health():
+    rows = list(reversed(graph().list_commits(100))) #list_commits returns newest commits but we want oldest -> newest
+    points = [
+        {
+            "id": row["id"],
+            "score": row["score"],
+            "created_at": row["created_at"]
+        }
+        for row in rows
+    ]
+    average = round(sum(point["score"] for point in points) / len(points), 1) if points else 0 #If there are commits, calculate average score. 
+    return {"average": average, "points": points}
+
+
+
