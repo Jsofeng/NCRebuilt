@@ -66,4 +66,15 @@ def health():
     return {"average": average, "points": points}
 
 
+@app.get("api/security-alerts")
+def security_alerts():
+    alerts = []
+    for row in graph().list_commits(100):
+        report = json.loads(row.get("report_json") or "{}") #Parse AI report JSON.
+        for finding in report.get("bug_scanner", {}).get("findings", []): #Safely get bug_scanner[findings]
+            if finding.get("severity") in {"HIGH", "CRITICAL"}:
+                alerts.append({"commit_id": row["id"], **finding}) #append the commit_id and the entire finding dict for that commit_id
+    
+    return alerts
+
 
