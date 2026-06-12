@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NeuralCommit Dashboard</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #09090b;
+        color: #f4f4f5;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: #09090b;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      header {
+        border-bottom: 1px solid #27272a;
+        background: #18181b;
+      }
+
+      .wrap {
+        width: min(1280px, 100%);
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 18px 24px;
+      }
+
+      h1,
+      h2,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: 0;
+      }
+
+      h2 {
+        margin-bottom: 12px;
+        color: #d4d4d8;
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .muted {
+        color: #a1a1aa;
+      }
+
+      .health-number {
+        font-size: 34px;
+        font-weight: 700;
+        text-align: right;
+      }
+
+      .eyebrow {
+        color: #71717a;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 360px minmax(0, 1fr);
+        gap: 16px;
+        padding-top: 24px;
+        padding-bottom: 24px;
+      }
+
+      .stack {
+        display: grid;
+        gap: 16px;
+      }
+
+      .panel {
+        border: 1px solid #27272a;
+        border-radius: 8px;
+        background: #18181b;
+        padding: 14px;
+      }
+
+      .main-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 16px;
+      }
+
+      .search {
+        width: 100%;
+        border: 1px solid #3f3f46;
+        border-radius: 6px;
+        outline: none;
+        background: #09090b;
+        color: #fafafa;
+        padding: 10px 12px;
+      }
+
+      .search:focus {
+        border-color: #22d3ee;
+      }
+
+      .commit-button,
+      .result-button {
+        display: block;
+        width: 100%;
+        border: 1px solid #27272a;
+        border-radius: 6px;
+        background: #09090b;
+        color: #e4e4e7;
+        cursor: pointer;
+        padding: 10px;
+        text-align: left;
+      }
+
+      .commit-button + .commit-button,
+      .result-button + .result-button {
+        margin-top: 8px;
+      }
+
+      .commit-button.active {
+        border-color: #22d3ee;
+        background: #27272a;
+      }
+
+      .commit-title {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 650;
+      }
+
+      .commit-title span:last-child {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .dot {
+        width: 12px;
+        height: 12px;
+        flex: 0 0 auto;
+        border-radius: 999px;
+      }
+
+      .green {
+        background: #10b981;
+      }
+
+      .yellow {
+        background: #f59e0b;
+      }
+
+      .red {
+        background: #ef4444;
+      }
+
+      .meta {
+        margin-top: 6px;
+        color: #71717a;
+        font-size: 12px;
+      }
+
+      .chart {
+        width: 100%;
+        height: 224px;
+        overflow: visible;
+      }
+
+      .alert {
+        border: 1px solid #7f1d1d;
+        border-radius: 6px;
+        background: rgba(127, 29, 29, 0.28);
+        padding: 10px;
+        font-size: 13px;
+      }
+
+      .alert + .alert {
+        margin-top: 8px;
+      }
+
+      .alert-file {
+        margin-top: 4px;
+        color: #fecaca;
+        font-size: 12px;
+      }
+
+      .report-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      pre {
+        min-height: 90px;
+        max-height: 320px;
+        overflow: auto;
+        margin: 0;
+        border-radius: 6px;
+        background: #09090b;
+        color: #d4d4d8;
+        padding: 12px;
+        font-size: 12px;
+        line-height: 1.45;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      .empty {
+        color: #71717a;
+        font-size: 14px;
+      }
+
+      @media (max-width: 920px) {
+        .layout,
+        .main-grid,
+        .report-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .topbar {
+          align-items: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wrap topbar">
+        <div>
+          <h1>NeuralCommit</h1>
+          <p class="muted">AI-native version control dashboard</p>
+        </div>
+        <div>
+          <div id="healthNumber" class="health-number">0</div>
+          <div class="eyebrow">Repo health</div>
+        </div>
+      </div>
+    </header>
+
+    <main class="wrap layout">
+      <aside class="stack">
+        <section class="panel">
+          <input id="searchInput" class="search" placeholder="Search commits in plain English" />
+          <div id="searchResults" style="margin-top: 10px"></div>
+        </section>
+
+        <section class="panel">
+          <h2>Commit Feed</h2>
+          <div id="commitFeed"></div>
+        </section>
+      </aside>
+
+      <section class="stack">
+        <div class="main-grid">
+          <section class="panel">
+            <h2>Repo Health Score</h2>
+            <svg id="healthChart" class="chart" viewBox="0 0 640 224" role="img" aria-label="Repo health score line chart"></svg>
+          </section>
+
+          <section class="panel">
+            <h2>Security Alerts</h2>
+            <div id="securityAlerts"></div>
+          </section>
+        </div>
+
+        <section class="panel">
+          <h2>Agent Report Panel</h2>
+          <div id="agentReport"></div>
+        </section>
+      </section>
+    </main>
+
+    <script>
+      const state = {
+        commits: [],
+        health: { average: 0, points: [] },
+        alerts: [],
+        selectedId: null,
+      };
+
+      const els = {
+        healthNumber: document.getElementById("healthNumber"),
+        searchInput: document.getElementById("searchInput"),
+        searchResults: document.getElementById("searchResults"),
+        commitFeed: document.getElementById("commitFeed"),
+        healthChart: document.getElementById("healthChart"),
+        securityAlerts: document.getElementById("securityAlerts"),
+        agentReport: document.getElementById("agentReport"),
+      };
+
+      function escapeHtml(value) {
+        return String(value)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function tone(score) {
+        if (score >= 80) return "green";
+        if (score >= 55) return "yellow";
+        return "red";
+      }
+
+      function selectedCommit() {
+        return state.commits.find((commit) => commit.id === state.selectedId) || state.commits[0] || null;
+      }
+
+      async function getJson(url, fallback) {
+        try {
+          const response = await fetch(url);
+          if (!response.ok) throw new Error(response.statusText);
+          return await response.json();
+        } catch (error) {
+          console.error("NeuralCommit dashboard request failed", url, error);
+          return fallback;
+        }
+      }
+
+      function renderFeed() {
+        if (state.commits.length === 0) {
+          els.commitFeed.innerHTML = '<p class="empty">No commits yet. Run nc add, nc commit, and nc push.</p>';
+          return;
+        }
+
+        els.commitFeed.innerHTML = state.commits
+          .map((commit) => {
+            const active = commit.id === selectedCommit()?.id ? " active" : "";
+            return `
+              <button class="commit-button${active}" data-commit="${escapeHtml(commit.id)}">
+                <div class="commit-title">
+                  <span class="dot ${tone(commit.score)}"></span>
+                  <span>${escapeHtml(commit.message)}</span>
+                </div>
+                <div class="meta">${escapeHtml(commit.id)} - score ${escapeHtml(commit.score)}</div>
+              </button>
+            `;
+          })
+          .join("");
+
+        document.querySelectorAll("[data-commit]").forEach((button) => {
+          button.addEventListener("click", () => {
+            state.selectedId = button.dataset.commit;
+            render();
+          });
+        });
+      }
+
+      function renderAlerts() {
+        if (state.alerts.length === 0) {
+          els.securityAlerts.innerHTML = '<p class="empty">No unresolved high-severity alerts.</p>';
+          return;
+        }
+
+        els.securityAlerts.innerHTML = state.alerts
+          .map(
+            (alert) => `
+              <div class="alert">
+                <strong>${escapeHtml(alert.severity)}: ${escapeHtml(alert.title)}</strong>
+                <div class="alert-file">${escapeHtml(alert.file)}:${escapeHtml(alert.line)}</div>
+              </div>
+            `
+          )
+          .join("");
+      }
+
+      function renderChart() {
+        const points = state.health.points || [];
+        const width = 640;
+        const height = 224;
+        const pad = 22;
+        const plotW = width - pad * 2;
+        const plotH = height - pad * 2;
+
+        if (points.length === 0) {
+          els.healthChart.innerHTML = '<text x="24" y="112" fill="#71717a" font-size="14">No health data yet.</text>';
+          return;
+        }
+
+        const coords = points.map((point, index) => {
+          const x = pad + (points.length === 1 ? plotW / 2 : (index / (points.length - 1)) * plotW);
+          const y = pad + plotH - (Number(point.score || 0) / 100) * plotH;
+          return `${x},${y}`;
+        });
+
+        els.healthChart.innerHTML = `
+          <line x1="${pad}" y1="${height - pad}" x2="${width - pad}" y2="${height - pad}" stroke="#3f3f46" />
+          <line x1="${pad}" y1="${pad}" x2="${pad}" y2="${height - pad}" stroke="#3f3f46" />
+          <polyline points="${coords.join(" ")}" fill="none" stroke="#22d3ee" stroke-width="3" />
+          ${coords
+            .map((coord) => {
+              const [x, y] = coord.split(",");
+              return `<circle cx="${x}" cy="${y}" r="4" fill="#22d3ee" />`;
+            })
+            .join("")}
+        `;
+      }
+
+      function renderReport() {
+        const commit = selectedCommit();
+        if (!commit) {
+          els.agentReport.innerHTML = '<p class="empty">No commits yet.</p>';
+          return;
+        }
+
+        const report = commit.report || {};
+        const entries = Object.entries(report);
+        if (entries.length === 0) {
+          els.agentReport.innerHTML = '<p class="empty">No agent report stored yet. Run nc push --no-ai or nc push.</p>';
+          return;
+        }
+
+        els.agentReport.innerHTML = `
+          <div class="report-grid">
+            ${entries
+              .map(([key, value]) => `<pre>${escapeHtml(key)}\n${escapeHtml(JSON.stringify(value, null, 2))}</pre>`)
+              .join("")}
+          </div>
+        `;
+      }
+
+      function render() {
+        els.healthNumber.textContent = state.health.average ?? 0;
+        renderFeed();
+        renderAlerts();
+        renderChart();
+        renderReport();
+      }
+
+      async function load() {
+        const [commits, health, alerts] = await Promise.all([
+          getJson("/api/commits", []),
+          getJson("/api/health", { average: 0, points: [] }),
+          getJson("/api/security-alerts", []),
+        ]);
+        state.commits = commits;
+        state.health = health;
+        state.alerts = alerts;
+        state.selectedId = commits[0]?.id || null;
+        render();
+      }
+
+      let searchTimer = null;
+      els.searchInput.addEventListener("input", () => {
+        clearTimeout(searchTimer);
+        const query = els.searchInput.value.trim();
+        if (!query) {
+          els.searchResults.innerHTML = "";
+          return;
+        }
+        searchTimer = setTimeout(async () => {
+          const results = await getJson(`/api/search?q=${encodeURIComponent(query)}`, []);
+          els.searchResults.innerHTML = results
+            .map(
+              (item) => `
+                <button class="result-button">
+                  ${escapeHtml(item.commit_id)} - ${Number(item.score || 0).toFixed(2)}
+                </button>
+              `
+            )
+            .join("");
+        }, 250);
+      });
+
+      load();
+    </script>
+  </body>
+</html>
