@@ -160,3 +160,27 @@ def main():
         repo = find_repo()
         result = run_push(repo, no_ai=no_ai)
         typer.echo(f"Pushed {result['commit_id']} with AI score {result['score']}")
+
+    @app.command()
+    def dashboard():
+        repo = find_repo() #finds NeuralCommit's root repo (e.g project/.neuralcommit)
+        env = os.environ.copy() #Copies current environment variables everything in .env . (e.g PATH, USERNAME, USERPROFILE, TEMP)
+        env["NEURALCOMMIT_REPO"] = str(repo) #adds "NEURALCOMMIT_REPO" to .env 
+
+        typer.echo("Starting dashboard API on http://localhost:3000")
+        
+        # Runs the command in terminal. Equivalent to python -m uvicorn neuralcommit.dashboard.backend.app:app --host 127.0.0.1 --port 3000
+        subprocess.run(
+            [
+                "python",
+                "-m",
+                "uvicorn",
+                "neuralcommit.dashboard.backend.app:app",
+                "--host",
+                "127.0.0.1",
+                "--port",
+                "3000",
+            ],
+            check=False, #if the server crashes don't crash the CLI
+            env=env,
+        )
